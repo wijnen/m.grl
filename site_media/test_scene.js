@@ -119,8 +119,6 @@ addEventListener("mgrl_media_ready", function () {
     //gl.enable(gl.CULL_FACE);
     gl.disable(gl.CULL_FACE);
 
-    gl.clearColor(.93, .93, .93, 1.0);
-
     // enable alpha blending
     gl.enable(gl.BLEND);
     //gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
@@ -203,6 +201,7 @@ addEventListener("mgrl_media_ready", function () {
         prog.activate();
 
         prog.vars.bg_fill = true;
+        please.set_clear_color(0.0, 0.0, 0.0, 0.0);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         please.gl.splat();
 
@@ -219,6 +218,7 @@ addEventListener("mgrl_media_ready", function () {
         prog.activate();
 
         // -- update uniforms
+        please.set_clear_color(.93, .93, .93, 1.0);
         prog.vars.light_direction = light_direction;
 
         // -- clear the screen
@@ -236,6 +236,7 @@ addEventListener("mgrl_media_ready", function () {
         prog.activate();
 
         // update uniforms, etc
+        please.set_clear_color(.93, .93, .93, 1.0);
         prog.samplers.depth_pass = "test/depth_pass";
         prog.samplers.color_pass = "demo_06/draw";
 
