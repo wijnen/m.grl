@@ -16,9 +16,9 @@ uniform sampler2D color_pass;
 
 // constants / settings
 const float two_pi = 6.28318530718;
-const float samples = 16.0;
+const float samples = 8.0;
 const float angle_step = two_pi / samples;
-const float radius_factor = 32.0;
+const float radius_factor = 64.0;
 
 // define additional types
 struct bokeh {
@@ -123,6 +123,9 @@ vec4 combine_fields(vec4 ref_color, vec4 bg_color, vec4 fg_color) {
   vec3 fg_a = vec3(1.0 - fg_color.a, 1.0 - fg_color.a, 1.0 - fg_color.a);
   vec3 bg_a = vec3(1.0 - bg_color.a, 1.0 - bg_color.a, 1.0 - bg_color.a);
   color = 1.0 - (bg_a * fg_a);
+
+  //color = mix(ref_color.rgb, vec3(0.0, 0.0, 0.0), color.r);
+  
   return vec4(color, 1.0);
   //return vec4(mix(vec3(0.0, 0.0, 0.0, fg_color.rgb, fg_color.a), 1.0);
 }
