@@ -70,7 +70,7 @@ vec4 scatter_sample(vec4 color_data, vec4 depth_data, bool bg_sampling) {
 
   float x, y, radius, angle = two_pi * rand.x;
   for (float i=0.0; i<samples; i+=1.0) {
-    radius = base_radius * prng(angle * depth_data.b);
+    radius = base_radius * prng(angle);
     x = gl_FragCoord.x + cos(angle)*radius;
     y = gl_FragCoord.y + sin(angle)*radius;
     angle += angle_step;
@@ -84,9 +84,9 @@ vec4 scatter_sample(vec4 color_data, vec4 depth_data, bool bg_sampling) {
     
     if (bg_sampling) {
       // only use depth samples from the background
-      if (depth_test.g < 0.01) {
-        continue;
-      }
+      // if (depth_test.g == 0.0) {
+      //   continue;
+      // }
       tmp_blur = depth_test.g;
     }
     else {
@@ -100,26 +100,31 @@ vec4 scatter_sample(vec4 color_data, vec4 depth_data, bool bg_sampling) {
     count += 1.0;
   }
   if (count == 0.0) {
-    // accumulator.color = color_data;
-    // accumulator.blur = 0.0;
-    accumulator.color = vec4(1.0, 0.0, 0.0, 1.0);
-    accumulator.blur = 1.0;
+    accumulator.color = color_data;
+    accumulator.blur = 0.0;
+    //accumulator.color = vec4(1.0, 0.0, 0.0, 1.0);
+    //accumulator.blur = 1.0;
     count = 1.0;
   }
   bokeh ret;
   ret.color = accumulator.color / count;
   ret.blur = accumulator.blur / count;
-  //return vec4(ret.color.rgb, ret.blur);
-  return ret.color.rgba;
+  return vec4(ret.color.rgb, ret.blur);
+  //return ret.color.rgba;
 }
 
 
 // combine foreground, background, and focused views
 vec4 combine_fields(vec4 ref_color, vec4 bg_color, vec4 fg_color) {
-  vec3 color = mix(ref_color.rgb, bg_color.rgb, bg_color.a);
+  vec3 color = ref_color.rgb;
+  color = mix(color, bg_color.rgb, bg_color.a);
   color = mix(color, fg_color.rgb, fg_color.a);
-  //return vec4(color, 1.0);
-  return vec4(mix(vec3(0.0, 0.0, 0.0), fg_color.rgb, fg_color.a), 1.0);
+  
+  vec3 fg_a = vec3(fg_color.a, fg_color.a, fg_color.a);
+  vec3 bg_a = vec3(bg_color.a, bg_color.a, bg_color.a);
+  //color = bg_a + fg_a;
+  return vec4(color, 1.0);
+  //return vec4(mix(vec3(0.0, 0.0, 0.0, fg_color.rgb, fg_color.a), 1.0);
 }
 
 
