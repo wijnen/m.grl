@@ -18,7 +18,7 @@ uniform sampler2D color_pass;
 const float two_pi = 6.28318530718;
 const float samples = 16.0;
 const float angle_step = two_pi / samples;
-const float blur_radius_factor = 32;
+const float blur_radius_factor = 32.0;
 
 // define additional types
 struct bokeh {
@@ -57,16 +57,18 @@ float prng(float n) {
 bokeh scatter_sample(vec4 color_data, vec4 depth_data, bool bg_sampling) {
   float base_radius = max(mgrl_buffer_width, mgrl_buffer_height) / blur_radius_factor;
 
-  vec2 rand = prng(gl_FragCoord.xy + depth_info.xy);
+  vec2 rand = prng(gl_FragCoord.xy + depth_data.rg);
+  vec2 select;
   bokeh accumulator;
   accumulator.color = vec4(0.0, 0.0, 0.0, 0.0);
   accumulator.blur = 0.0;
+  float count = 0.0;
   vec4 depth_test;
   vec4 tmp_color;
 
   float x, y, radius, angle = two_pi * rand.x;
   for (float i=0.0; i<samples; i+=1.0) {
-    radius = prng(angle * depth_info.b);
+    radius = prng(angle * depth_data.b);
     x = gl_FragCoord.x + cos(angle)*radius;
     y = gl_FragCoord.y + sin(angle)*radius;
     angle += angle_step;
@@ -74,7 +76,7 @@ bokeh scatter_sample(vec4 color_data, vec4 depth_data, bool bg_sampling) {
     if (x < 0.0 || y < 0.0 || x >= mgrl_buffer_width || y >= mgrl_buffer_height) {
       continue;
     }
-    select = pick(vec2(x, y));
+    select = local_coord(vec2(x, y));
     depth_test = texture2D(depth_pass, select);
     tmp_color = texture2D(color_pass, select);
 
@@ -108,7 +110,7 @@ bokeh scatter_sample(vec4 color_data, vec4 depth_data, bool bg_sampling) {
 // combine foreground, background, and focused views
 vec4 combine_fields(vec4 ref_color, vec4 bg_color, vec4 fg_color) {
   vec3 color = mix(ref_color.rgb, bg_color.rgb, bg_color.a);
-  vec3 color = mix(color, fg_color.rgb, fg_color.a);
+  color = mix(color, fg_color.rgb, fg_color.a);
   return vec4(color, 1.0);
 }
 
