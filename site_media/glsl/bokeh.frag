@@ -57,12 +57,13 @@ float prng(float n) {
 vec4 scatter_sample(vec4 color_data, vec4 depth_data, bool bg_sampling) {
   float base_radius = max(mgrl_buffer_width, mgrl_buffer_height) / radius_factor;
 
-  vec2 rand = prng(gl_FragCoord.xy + depth_data.rg);
-  vec2 select;
   bokeh accumulator;
   accumulator.color = vec4(0.0, 0.0, 0.0, 0.0);
   accumulator.blur = 0.0;
   float count = 0.0;
+  
+  vec2 rand = prng(gl_FragCoord.xy + depth_data.rg);
+  vec2 select;
   vec4 depth_test;
   vec4 tmp_color;
   float tmp_blur;
@@ -108,7 +109,8 @@ vec4 scatter_sample(vec4 color_data, vec4 depth_data, bool bg_sampling) {
   bokeh ret;
   ret.color = accumulator.color / count;
   ret.blur = accumulator.blur / count;
-  return vec4(ret.color.rgb, ret.blur);
+  //return vec4(ret.color.rgb, ret.blur);
+  return ret.color.rgba;
 }
 
 
