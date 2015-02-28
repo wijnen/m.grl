@@ -54,7 +54,7 @@ float prng(float n) {
 
 
 // calculate the foreground / background blur
-vec4 scatter_sample(vec4 color_data, vec4 depth_data, bool bg_sampling) {
+vec4 scatter_sample(vec4 color_data, vec4 depth_data, bool bg_sampling) {  
   float base_radius = max(mgrl_buffer_width, mgrl_buffer_height) / radius_factor;
 
   bokeh accumulator;
@@ -84,9 +84,9 @@ vec4 scatter_sample(vec4 color_data, vec4 depth_data, bool bg_sampling) {
     
     if (bg_sampling) {
       // only use depth samples from the background
-      // if (depth_test.g == 0.0) {
-      //   continue;
-      // }
+      if (depth_test.g == 0.0) {
+        continue;
+      }
       tmp_blur = depth_test.g;
     }
     else {
@@ -120,9 +120,9 @@ vec4 combine_fields(vec4 ref_color, vec4 bg_color, vec4 fg_color) {
   color = mix(color, bg_color.rgb, bg_color.a);
   color = mix(color, fg_color.rgb, fg_color.a);
   
-  vec3 fg_a = vec3(fg_color.a, fg_color.a, fg_color.a);
-  vec3 bg_a = vec3(bg_color.a, bg_color.a, bg_color.a);
-  //color = bg_a + fg_a;
+  vec3 fg_a = vec3(1.0 - fg_color.a, 1.0 - fg_color.a, 1.0 - fg_color.a);
+  vec3 bg_a = vec3(1.0 - bg_color.a, 1.0 - bg_color.a, 1.0 - bg_color.a);
+  color = 1.0 - (bg_a * fg_a);
   return vec4(color, 1.0);
   //return vec4(mix(vec3(0.0, 0.0, 0.0, fg_color.rgb, fg_color.a), 1.0);
 }
