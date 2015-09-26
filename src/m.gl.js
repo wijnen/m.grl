@@ -20,6 +20,7 @@ please.gl = {
         "current" : null,
         "programs" : {},
         "textures" : {},
+        "rendered" : [],
     },
     "__macros" : [],
 };
@@ -1183,6 +1184,13 @@ please.gl.set_framebuffer = function (handle) {
         gl.viewport(0, 0, width, height);
     }
     else {
+        if (please.gl.__cache.rendered.indexOf(handle) !== -1) {
+            console.info(handle);
+            throw("already drawn this frame!");
+        }
+        else {
+            please.gl.__cache.rendered.push(handle);
+        }
         var tex = please.gl.__cache.textures[handle];
         if (tex && tex.fbo) {
             var width = prog.vars.mgrl_buffer_width = tex.fbo.options.width;

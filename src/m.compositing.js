@@ -290,7 +290,6 @@ please.render = function(node) {
                 "type" : type,
                 "period" : period,
             };
-            gl.finish();
             gl.readPixels(0, 0, width, height, format, type, node.__stream_cache);
             node.stream_callback(node.__stream_cache, info);
         }

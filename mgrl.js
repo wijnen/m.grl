@@ -2478,6 +2478,8 @@ please.pipeline.__on_draw = function () {
     var start_time = performance.now();
     please.pipeline.__fps_samples.push(start_time);
     please.pipeline.__framestart = start_time;
+    // clear fbo redundant write trap
+    please.gl.__cache.rendered = [];
     // if necessary, generate the sorted list of pipeline stages
     if (please.pipeline.__dirty) {
         please.pipeline.__regen_cache();
@@ -2756,6 +2758,7 @@ please.gl = {
         "current" : null,
         "programs" : {},
         "textures" : {},
+        "rendered" : [],
     },
     "__macros" : [],
 };
@@ -3804,6 +3807,13 @@ please.gl.set_framebuffer = function (handle) {
         gl.viewport(0, 0, width, height);
     }
     else {
+        if (please.gl.__cache.rendered.indexOf(handle) !== -1) {
+            console.info(handle);
+            throw("already drawn this frame!");
+        }
+        else {
+            please.gl.__cache.rendered.push(handle);
+        }
         var tex = please.gl.__cache.textures[handle];
         if (tex && tex.fbo) {
             var width = prog.vars.mgrl_buffer_width = tex.fbo.options.width;
@@ -7200,7 +7210,6 @@ please.render = function(node) {
                 "type" : type,
                 "period" : period,
             };
-            gl.finish();
             gl.readPixels(0, 0, width, height, format, type, node.__stream_cache);
             node.stream_callback(node.__stream_cache, info);
         }

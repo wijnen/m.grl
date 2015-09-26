@@ -216,6 +216,9 @@ please.pipeline.__on_draw = function () {
     please.pipeline.__fps_samples.push(start_time);
     please.pipeline.__framestart = start_time;
 
+    // clear fbo redundant write trap
+    please.gl.__cache.rendered = [];
+
     // if necessary, generate the sorted list of pipeline stages
     if (please.pipeline.__dirty) {
         please.pipeline.__regen_cache();
