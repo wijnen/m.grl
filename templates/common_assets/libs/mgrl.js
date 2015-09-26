@@ -2821,6 +2821,11 @@ please.gl.set_context = function (canvas_id, options) {
         gl.enable(gl.BLEND);
         gl.blendFuncSeparate(
             gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.SRC_ALPHA, gl.ONE);
+        // enable depth testing
+        gl.enable(gl.DEPTH_TEST);
+        gl.depthFunc(gl.LEQUAL);
+        // enable culling
+        gl.enable(gl.CULL_FACE);
         // fire an event to indicate that a gl context exists now
         var ctx_event = new CustomEvent("mgrl_gl_context_created");
         window.dispatchEvent(ctx_event);
@@ -3347,13 +3352,9 @@ please.glsl = function (name /*, shader_a, shader_b,... */) {
                 };
             }
             else {
-                // This is the setter binding for sampler arrays.
-                setter_method = function (value) {
-                    if (prog.__cache.vars[binding_name] !== value) {
-                        prog.__cache.vars[binding_name] = value;
-                        return gl[uni](pointer, value);
-                    }
-                };
+                throw(
+                    "M.GRL does not support sampler arrays.  " + "See this issue for more details:\n" + "https://github.com/Aeva/m.grl/issues/155"
+                );
             }
         }
         prog.vars.__defineSetter__(binding_name, setter_method);
